@@ -1,2 +1,0 @@
-# AT12CTEAMWORK
-GFFめざすんご
