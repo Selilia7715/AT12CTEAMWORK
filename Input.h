@@ -7,8 +7,12 @@
 #define _INPUT_H_
 
 #define DIRECTINPUT_VERSION 0x0800
+#define INITGUID
 
+#include <stdio.h>
+#include <windows.h>
 #include <dinput.h>
+
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
 
@@ -35,5 +39,7 @@ long GetMouseAxisY(void);
 long GetMouseAxisZ(void);
 long GetMouseX(void);
 long GetMouseY(void);
+
+
 
 #endif

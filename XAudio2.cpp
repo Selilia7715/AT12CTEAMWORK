@@ -16,7 +16,7 @@ typedef struct
 PARAM g_param[SOUND_LABEL_MAX] =
 {
 	{"BGM/Everything_Everytime.wav", true},	// タイトルBGM（ループさせるのでtrue設定）
-	{"BGM/Karma.wav", true},	// ゲームBGM
+	{"BGM/karma.wav", true},	// ゲームBGM
 	{"SE/bomb0.wav", false},		// サンプルSE（ループしないのでfalse設定）
 	{"SE/defend0.wav", false},		// サンプルSE
 	{"SE/defend1.wav", false},		// サンプルSE
