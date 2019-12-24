@@ -20,10 +20,6 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;	// Deviceオブジェクト(描画に必要)
 int g_nCountFPS = 0;
 float g_dispFPS = 0;
 
-IGraphBuilder *pGraphBuilder;
-IMediaControl *pMediaControl;
-IVideoWindow *pVideoWindow;
-
 // 純粋仮想関数
 int SceneFlag = 1; // シーンフラグ
 
@@ -140,12 +136,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 					switch (SceneFlag)
 					{
 					case 1:// Title
-
-
-
-						// 再生開始
-						pMediaControl->Run();
-
 						title.Update(&SceneFlag);							   // 更新
 						title.Draw(&g_pD3DDevice);						   // 描画
 
@@ -190,10 +180,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	// 終了処理
 	Uninit();
-	// COM終了
-	CoUninitialize();
 
-	return (int)msg.wParam, 0;
+	return (int)msg.wParam;
 }
 
 //=============================================================================
@@ -261,8 +249,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	D3DPRESENT_PARAMETERS d3dpp;
 	D3DDISPLAYMODE d3ddm;
 
-	// COMを初期化
-	CoInitialize(NULL);
 
 	// Direct3Dオブジェクトの生成
 	g_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -270,27 +256,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	{
 		return E_FAIL;
 	}
-
-	// FilterGraphを生成
-	CoCreateInstance(CLSID_FilterGraph,
-		NULL,
-		CLSCTX_INPROC,
-		IID_IGraphBuilder,
-		(LPVOID *)&pGraphBuilder);
-
-	// MediaControlインターフェース取得
-	pGraphBuilder->QueryInterface(IID_IMediaControl,
-		(LPVOID *)&pMediaControl);
-
-	//// フルスクリーンにできる
-	//pGraphBuilder->QueryInterface(IID_IVideoWindow,
-	//	(LPVOID *)&pVideoWindow);
-
-	BSTR bstr1 = CComBSTR(FILENAME);
-	// Graphを生成
-	pMediaControl->RenderFile(bstr1);
-	//// Full Screen 開始
-	//pVideoWindow->put_FullScreenMode(OATRUE);
 
 	// 現在のディスプレイモードを取得
 	if (FAILED(g_pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
@@ -400,11 +365,6 @@ void Uninit(void)
 		g_pD3D->Release();
 		g_pD3D = NULL;
 	}
-
-	// 資源を解放
-	pMediaControl->Release();
-	pGraphBuilder->Release();
-	pVideoWindow->Release();
 
 	// 解放処理
 	title.Uninit();

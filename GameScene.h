@@ -4,21 +4,35 @@
 #include "xinpututil.h"
 #include <math.h>
 
-#define BLOCK_WIDTH		40				// ブロックの幅
-#define BLOCK_HEIGHT	40				// ブロックの高さ
+#define BLOCK_WIDTH			40
+#define BLOCK_HEIGHT		40
 
-#define SEPARATEWIDTH   32				//画面分割数（横）
-#define SEPARATEHEIGHT  18				//画面分割数（縦）
-#define STAGEMAX		1 		        //ステージ数
-#define MAX_TRIANGLE    20				//最大三角形設置可能数（ステージ毎）
+#define SEPARATEWIDTH		32			//画面分割数（横）
+#define SEPARATEHEIGHT		18			//画面分割数（縦）
+#define STAGEMAX			1 		    //ステージ数
+#define SEPARATESCROLLNUM	1.2//大きくするとスクロールまでが早くなる（２で真ん中、１で一番端）
 
-#define Gravity		      0.1			// 重力
-#define JumpASpeed		 -15			// ジャンプ力
+										//60fps
+#define	ERASEBLOCKTIME	240				//ブロックジェネレータが出したブロックが消えるまでの時間
+#define CREATEBLOCKRATE 240				//ブロックジェネレータがブロックを出す間隔
 
+#define Gravity		      0.1
+#define JumpASpeed		  -30
 
 enum MAPCHIP {
 	NONE = -1,
 	BLOCK,
+	
+	GOAL,
+	
+};
+
+enum DIRECTION {
+	NORMAL,
+	UP,
+	DAWN,
+	RIGHT,
+	LEFT
 };
 
 // ゲームシーン
@@ -45,20 +59,27 @@ class GameScene
 	public:
 
 		LPDIRECT3DTEXTURE9  Blocktex[1] = { NULL };    // テクスチャを格納する変数(地面)
-		static int stage;								//ステージ数ー１
+		static int stage[STAGEMAX];									   //ステージ数ー１
+		//int stagewidth[STAGEMAX] = { 320 };			   //ステージごとの横幅				
 
 		//[ステージ数][y][x](テクスチャ番号)
-		static int Blocktexinfo[STAGEMAX][SEPARATEHEIGHT][SEPARATEWIDTH]; 
+		static int Stage1Blocktexinfo[SEPARATEHEIGHT][320]; 
+		static float CameraCoord;					//ステージのｘ座標(Playerで起動、Stage関数、画面スクロール時に使用)
 
+		
 		//void LoadMapchip(int stage);
 		void InitMapchip(HWND *pHWND, LPDIRECT3DDEVICE9 *device, int *tex, POINT *pcl);
-		void UpdateMapchip();
+		void UpdateMapchip(int num);													//引数：どのステージを描画するか
 		void DrawMapchip(LPDIRECT3DDEVICE9 *device);
 		void Uninit();
+		
+		static void UpdateStageCoord();					//画面スクロール
 	private:
-		void DrawBlock(LPDIRECT3DDEVICE9 device);
+		void DrawBlock(LPDIRECT3DDEVICE9 device);										//基本的に動かなくて四角のブロック
 		void DrawDiagonalMapchip(LPDIRECT3DDEVICE9 device);
 
+
+														
 		//→ｘ		↓ｙ
 		//第一段階（ブロック）
 		VERTEX_2D StageBlock[VERTEX_MAX];					
@@ -67,6 +88,9 @@ class GameScene
 
 		//第二段階（斜め方向(三角形）などのマップチップ）
 		VERTEX_2D DiagonalMapchip[STAGEMAX][20][3];//[ステージ数][三角形の数(テクスチャ番号）][頂点数]
+
+	protected:
+		int currentstagenum = 1;											//現在どのステージが描画されてるか
 	};
 
 	class Player
@@ -78,19 +102,20 @@ class GameScene
 		bool JumpFg;										//地面についてる時のみ可能
 		bool LandFg;										//地面についているときtrue
 
+		//↓updateに入れる
+		//重力処理
+		void FreeFall();
+		//プレイヤー操作
+		void CheckLand();							//地面についてるかチェック
+
+
 	public:
-		void FreeFall();									 //重力処理
-		void PlayerOperation();								 //プレイヤー操作
-		VERTEX_2D player_vertex[VERTEX_MAX];                 // player
-		D3DVECTOR now_playerPosition;                        // player座標(現在座標)
-		D3DVECTOR next_playerPosition;                       // player座標(次の座標)
+
+		VERTEX_2D player_vertex[VERTEX_MAX];				 // player
+		static D3DVECTOR m_playerPosition;                   // player座標
 		D3DXVECTOR2 m_shieldPosistion;						 // shield座標（描画用の変数は別に作る）
 		bool SHIELD_Fg;										 //シールド出してるかフラグ
 		bool isflg = false;                                  // 
-
-		// XBOX(斜め移動)
-		double moveHorizontal = 0;
-		double moveVertical = 0;
 
 		LPDIRECT3DTEXTURE9  m_player_pD3DTexture = NULL;     // テクスチャを格納する変数
 		LPDIRECT3DTEXTURE9  m_shield_pD3DTexture = NULL;     // テクスチャを格納する変数
@@ -101,7 +126,8 @@ class GameScene
 		void Init(HWND *pHWND, LPDIRECT3DDEVICE9 *device, int *tex, POINT *pcl);     // 初期化
 		void Draw(LPDIRECT3DDEVICE9 *device);                                        // 描画
 		void Update(int *scene);                                                     // 更新
-		void Uninit(void);															 // 解放
+		void PlayerOperation();								//プレイヤー操作
+		void Uninit(void);															// 解放
 
 		VERTEX_2D shield_vertex[VERTEX_MAX];
 		void DesideShieldPlace();							//シールド位置決定
@@ -125,5 +151,8 @@ public:
 	void Draw(LPDIRECT3DDEVICE9 *device);                                        // 描画
 	void Update(int *scene);                                                     // 更新
 	void Uninit(void);                                                           // 解放
+
+
+
 
 };

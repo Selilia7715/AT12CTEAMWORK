@@ -3,9 +3,6 @@
 #include "Input.h"
 #include"XAudio2.h"
 
-#pragma comment(lib,"strmiids.lib")
-#define	FILENAME L"dawn.mpg"
-
 // ƒ^ƒCƒgƒ‹
 class Title 
 {
