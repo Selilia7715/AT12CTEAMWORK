@@ -429,28 +429,28 @@ void GameScene::Player::Update(int *scene)
 	shield_vertex[3].x = m_shieldPosistion.x + SHIELD_THICKNESS;
 	shield_vertex[3].y = m_shieldPosistion.y + SHIELD_WIDTH;
 
-	//// XBOX
-	////移動処理
-	//// 右(-255と1の間の時は右へ動く)
-	//if (GetXinputThumbLX(0) < 0)
-	//{
-	//	m_playerPosition.x -= KYARA_SPEED_MAX;
-	//}
-	//// 左(1と255の間の時は左へ動く)
-	//if (GetXinputThumbLX(0) > 0)
-	//{
-	//	m_playerPosition.x += KYARA_SPEED_MAX;
-	//}
-	//// 上(1と255の間の時は上へ動く)
-	//if (GetXinputThumbLY(0) < 0)
-	//{
-	//	m_playerPosition.y += KYARA_SPEED_MAX;
-	//}
-	//// 下(-255と1の時は下へ動く)
-	//if (GetXinputThumbLY(0) > 0)
-	//{
-	//	m_playerPosition.y -= KYARA_SPEED_MAX;
-	//}
+	// XBOX
+	//移動処理
+	// 右(-255と1の間の時は右へ動く)
+	if (GetXinputThumbLX(0) < 0)
+	{
+		now_playerPosition.x -= KYARA_SPEED_MAX;
+	}
+	// 左(1と255の間の時は左へ動く)
+	if (GetXinputThumbLX(0) > 0)
+	{
+		now_playerPosition.x += KYARA_SPEED_MAX;
+	}
+	// 上(1と255の間の時は上へ動く)
+	if (GetXinputThumbLY(0) < 0)
+	{
+		now_playerPosition.y += KYARA_SPEED_MAX;
+	}
+	// 下(-255と1の時は下へ動く)
+	if (GetXinputThumbLY(0) > 0)
+	{
+		now_playerPosition.y -= KYARA_SPEED_MAX;
+	}
 
 	FreeFall();				//重力処理
 	PlayerOperation();		//プレイヤー操作
